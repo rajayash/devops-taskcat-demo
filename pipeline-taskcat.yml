@@ -5,19 +5,19 @@ Parameters:
   GitHubUser:
     Type: String
     Description: GitHub User
-    Default: "PaulDuvall"
+    Default: "rajayash"
   GitHubRepo:
     Type: String
     Description: GitHub Repo to pull from. Only the Name. not the URL
-    Default: "aws-encryption-workshop"
+    Default: "devops-taskcat-demo"
   GitHubBranch:
     Type: String
     Description: GitHub Branch
-    Default: "master"
+    Default: "main"
   GitHubToken:
     NoEcho: true
     Type: String
-    Default: '{{resolve:secretsmanager:github/personal-access-token:SecretString}}'
+    Default: '{{resolve:secretsmanager:github/personal-access-token-rajayash:SecretString}}'
     Description: GitHub Token. Must be defined in AWS Secrets Manager and here https://github.com/settings/tokens
 Metadata:
   AWS::CloudFormation::Interface:
@@ -43,7 +43,6 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     Properties:
-      AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
   CodePipelineRole:
@@ -146,24 +145,7 @@ Resources:
       Source:
         Type: GITHUB
         Location: !Sub https://github.com/${GitHubUser}/${GitHubRepo}.git
-        BuildSpec: buildspec-setup.yml
-      TimeoutInMinutes: 10
-  CodeBuildCleanup:
-    Type: AWS::CodeBuild::Project
-    DependsOn: CodeBuildRole
-    Properties:
-      Description: Setup Test Files. For example uploading to S3
-      ServiceRole: !GetAtt CodeBuildRole.Arn
-      Artifacts:
-        Type: NO_ARTIFACTS
-      Environment:
-        Type: LINUX_CONTAINER
-        ComputeType: BUILD_GENERAL1_SMALL
-        Image: "aws/codebuild/amazonlinux2-x86_64-standard:3.0"
-      Source:
-        Type: GITHUB
-        Location: !Sub https://github.com/${GitHubUser}/${GitHubRepo}.git
-        BuildSpec: buildspec-cleanup.yml
+        BuildSpec: buildspec.yml
       TimeoutInMinutes: 10
   CodeBuildTaskCatTest:
     Type: AWS::CodeBuild::Project
@@ -202,7 +184,7 @@ Resources:
                 python: 3.7
             post_build:
               commands:
-                - aws s3 cp --recursive --acl public-read ./taskcat_outputs s3://${SiteBucket}/ 
+                - aws s3 cp --recursive ./taskcat_outputs s3://${SiteBucket}/ 
           artifacts:
             type: zip
             files:
