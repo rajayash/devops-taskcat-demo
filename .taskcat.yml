@@ -4,5 +4,5 @@ project:
     - us-east-1
     - us-east-2
 tests:
-  sqs-test:
+  network-test:
     template: ./network.yml
