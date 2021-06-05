@@ -5,4 +5,4 @@ project:
     - us-east-2
 tests:
   sqs-test:
-    template: ./sqs.yml
+    template: ./network.yml
