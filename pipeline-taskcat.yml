@@ -41,7 +41,7 @@ Metadata:
 Resources:
   SiteBucket:
     Type: AWS::S3::Bucket
-    DeletionPolicy: Retain
+    DeletionPolicy: Delete
     Properties:
       WebsiteConfiguration:
         IndexDocument: index.html
@@ -80,7 +80,7 @@ Resources:
             - cloudwatch:*
             - codebuild:*
             - s3:*
-            - ec2:*
+            - ec2:*s3
             - iam:PassRole
             Resource: "*"
             Effect: Allow
